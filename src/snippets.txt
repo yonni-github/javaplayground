@@ -1,0 +1,222 @@
+
+public class MinimalTree {
+	
+	static TreeNode root = null;
+
+	private static class TreeNode{
+
+		int data;
+		TreeNode[] children;
+		TreeNode parent;
+		
+		int height() {
+			int leftHeight = this.children[0] !=null ? this.children[0].height() : 0;
+			int rightHeight = this.children[1] !=null ? this.children[1].height() : 0;
+			
+			return 1 + Math.max(leftHeight, rightHeight);
+		}
+		
+		boolean isBalanced() {
+			
+			//	if(this.children[0] == null && this.children[1] ==null)
+			//		return true;
+			
+			int leftHeight = this.children[0] !=null ? this.children[0].height() : 0;
+			int rightHeight = this.children[1] !=null ? this.children[1].height() : 0;
+				
+			return Math.abs(rightHeight - leftHeight) <= 1;
+			
+		}
+		
+		void print(int level) {
+			space(level);
+			System.out.println(this.data);
+			level++;
+			if(this.children[0] != null) {
+				this.children[0].print(level);
+			}
+			if(this.children[1] != null) {
+				this.children[1].print(level);
+			}
+		}
+		void space(int level) {
+			for(int i= 1; i< level; i++) {
+				System.out.print("  ");
+			}
+		}
+		void insert(TreeNode n) {
+			
+			if(this.data > n.data) {
+				if(this.children[0] == null) {
+					this.children[0] = n;
+					this.children[0].parent = this;
+				}else {
+					this.children[0].insert(n);
+				}
+				
+				/*if(!this.isBalanced()) {
+					TreeNode rl = this.children[0].children[1];
+					TreeNode ll = this.children[0].children[0];
+					
+					if(rl != null) {
+						this.children[0].children[1] = null;
+						this.parent.children[0] = rl;
+						rl.parent = this.parent;
+						rl.children[0] = this.children[0];
+						this.children[0] = null;
+						rl.children[1] = this;
+						
+					}
+					else if(ll != null) {
+						if(this.parent != null)
+							this.parent.children[0] = this.children[0];
+						else
+							root = this.children[0];
+						
+						this.children[0].parent = this.parent;
+						this.children[0].children[1] = this;
+						this.children[0] = rl;
+						this.parent = this.children[0];					
+					}
+					
+				}*/
+			}
+			else {
+				if(this.children[1] == null) {
+					this.children[1] = n;
+					this.children[1].parent = this;
+				}else {
+					this.children[1].insert(n);
+				}
+				
+			/*	if(!this.isBalanced()) {
+					TreeNode rl = this.children[1].children[1];
+					TreeNode ll = this.children[1].children[0];
+					
+					if(rl != null) {
+						if(this.parent !=null)
+							this.parent.children[1] = this.children[1];
+						else
+							root = this.children[1];
+						
+						this.children[1].parent = this.parent;
+						this.children[1].children[0] = this;
+						this.children[1] = ll;
+						this.parent = this.children[1];						
+					}
+					else if(ll != null) {	
+						this.children[1].children[0] = null;
+						this.parent.children[1] = ll;
+						ll.parent = this.parent;
+						ll.children[1] = this.children[1];
+						this.children[1] = null;
+						ll.children[0] = this;
+					}
+					
+				} */
+			}
+			
+			if(!this.isBalanced()) {
+				int leftHeight = this.children[0] !=null ? this.children[0].height() : 0;
+				int rightHeight = this.children[1] !=null ? this.children[1].height() : 0;
+				
+				if(leftHeight > rightHeight) {
+					this.rotateRight();
+				}else {
+					this.rotateLeft();
+				}
+			}
+		}
+		void rotateRight() {
+			TreeNode rl = this.children[0].children[1];
+			TreeNode ll = this.children[0].children[0];
+			
+			if(this.parent !=null) {
+				if(this.parent.children[0] == this)
+					this.parent.children[0] = this.children[0];
+				else
+					this.parent.children[1] = this.children[0];
+			}
+			else
+				root = this.children[1];
+			
+			this.children[0].parent = this.parent;
+			this.children[0].children[1] = this;
+			this.parent = this.children[0];	
+			this.children[0] = rl;
+			if(rl !=null)
+				rl.parent = this.children[0];
+		}
+		void rotateLeft() {
+			TreeNode rl = this.children[1].children[1];
+			TreeNode ll = this.children[1].children[0];
+			
+			if(this.parent !=null) {
+				if(this.parent.children[0] == this)
+					this.parent.children[0] = this.children[1];
+				else
+					this.parent.children[1] = this.children[1];
+			}
+			else
+				root = this.children[1];
+			
+			this.children[1].parent = this.parent;
+			this.children[1].children[0] = this;
+			this.parent = this.children[1];	
+			this.children[1] = ll;
+			if(ll !=null)
+				ll.parent = this.children[1];			
+		}
+		
+		public TreeNode(int data) {
+
+			super();
+			this.data = data;
+			children = new TreeNode[2];
+		}
+
+	}
+	
+	int treeHeight() {
+		if(root== null)
+			return 0;
+		
+		return root.height();
+	}
+	
+	void insertValue(int d) {
+		TreeNode newNode = new TreeNode(d);
+		
+		if(root == null) {
+			root = newNode;
+		}else {
+			root.insert(newNode);
+		}
+		
+	}
+	
+	void printTree() {
+		if (root != null)
+			root.print(1);
+	}
+
+	public static void main(String[] args) {
+		//int[] input = { 5,1,6,3,7,0,2,4,9,8};
+		int[] input = { 6,1,12,11,10,8};
+		//int[] input = { 0,1,2,3,4,5,6,7,8,9};
+		MinimalTree mt = new MinimalTree();
+		
+		for(int i: input) {
+			mt.insertValue(i);
+			System.out.println("---------------------------");
+			mt.printTree();
+		}
+		
+		System.out.println("Tree height: " + mt.treeHeight());
+		System.out.println(mt.root.isBalanced());
+
+	}
+
+}
+
+____________________________________________________________________________________
